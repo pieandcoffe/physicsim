@@ -53,20 +53,20 @@ func _handle_input(delta: float) -> void:
 	if Input.is_key_pressed(KEY_Q): quad_b.rotation -= rot_speed * delta
 	if Input.is_key_pressed(KEY_E): quad_b.rotation += rot_speed * delta
 
-func _update_collision_state() -> void:
-	if obb_overlap(quad_a, quad_b):
-		quad_a.overlap = true
-		quad_b.overlap = true
-	else:
-		quad_a.overlap = false
-		quad_b.overlap = false
+func _spawn_collision_shape(position: Vector2) -> CollisionShape:
+	var new_quad = OBBQuad.new()
+	new_quad.position = position
+	new_quad.half_extents = Vector2(32, 32)
+	new_quad.shape_color = Color8(240, 125, 95)
+	return new_quad
 
-func _queue_redraws() -> void:
-	quad_a.queue_redraw()
-	quad_b.queue_redraw()
+func _shapes_collide(a: CollisionShape, b: CollisionShape) -> bool:
+	if a is OBBQuad and b is OBBQuad:
+		return obb_overlap(a, b)
+	return false
 
 func _update_label() -> void:
-	label.text = "F1 AABB   [F2 OBB]   F3 SAT\n   BoxA : move ARROWS, rotate R/T\n   BoxB : move WASD, rotate Q/E\nColliding: %s" % quad_a.overlap
+	label.text = "F1 AABB   [F2 OBB]   F3 SAT\n   BoxA : move ARROWS, rotate R/T\n   BoxB : move WASD, rotate Q/E\n   Left click: spawn OBB\nColliding: %s" % quad_a.overlap
 
 func _draw() -> void:
 	var axes_a = quad_a.get_axes()

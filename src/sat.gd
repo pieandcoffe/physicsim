@@ -43,28 +43,21 @@ func _handle_input(delta: float) -> void:
 	if Input.is_key_pressed(KEY_Q): polygon_b.rotation -= rot_speed * delta
 	if Input.is_key_pressed(KEY_E): polygon_b.rotation += rot_speed * delta
 
-func _update_collision_state() -> void:
-	polygon_a.overlap = false
-	polygon_b.overlap = false
-	polygon_c.overlap = false
-	
-	if sat_overlap(polygon_a, polygon_b):
-		polygon_a.overlap = true
-		polygon_b.overlap = true
-	if sat_overlap(polygon_b, polygon_c):
-		polygon_b.overlap = true
-		polygon_c.overlap = true
-	if sat_overlap(polygon_c, polygon_a):
-		polygon_c.overlap = true
-		polygon_a.overlap = true
+func _spawn_collision_shape(position: Vector2) -> CollisionShape:
+	var new_poly = SATPolygon.new()
+	new_poly.position = position
+	new_poly.sides = 5
+	new_poly.extents = 36
+	new_poly.shape_color = Color8(145, 225, 135)
+	return new_poly
 
-func _queue_redraws() -> void:
-	polygon_a.queue_redraw()
-	polygon_b.queue_redraw()
-	polygon_c.queue_redraw()
+func _shapes_collide(a: CollisionShape, b: CollisionShape) -> bool:
+	if a is SATPolygon and b is SATPolygon:
+		return sat_overlap(a, b)
+	return false
 
 func _update_label() -> void:
-	label.text = "F1 AABB   F2 OBB   [F3 SAT]\n   Polygon A : move ARROWS, rotate R/T\n   Polygon B : move WASD, rotate Q/E\nColliding: %s" % (polygon_a.overlap or polygon_b.overlap)
+	label.text = "F1 AABB   F2 OBB   [F3 SAT]\n   Polygon A : move ARROWS, rotate R/T\n   Polygon B : move WASD, rotate Q/E\n   Left click: spawn polygon\nColliding: %s" % (polygon_a.overlap or polygon_b.overlap or polygon_c.overlap)
 
 func _draw() -> void:
 	if (sat_overlap(polygon_a, polygon_b)):
