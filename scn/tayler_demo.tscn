@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://dswmcfe70mkoa"]
+
+[ext_resource type="Script" uid="uid://dl6at3lqlci2m" path="res://src/tayler_demo.gd" id="1_byygy"]
+
+[node name="TaylerDemo" type="Node2D"]
+script = ExtResource("1_byygy")
+n_terms = 2
+x_range = 100.0
+scale_px = 100.0
+
+[node name="FormaulaDisplay" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="ExactCurve" type="Line2D" parent="."]
+
+[node name="TaylorCurve" type="Line2D" parent="."]

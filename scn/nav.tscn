@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://cuosx0rnoi7gq"]
+
+[ext_resource type="Script" uid="uid://dwkrb13g1osks" path="res://src/nav.gd" id="1_cgwuo"]
+
+[node name="nav" type="CanvasLayer"]
+script = ExtResource("1_cgwuo")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
