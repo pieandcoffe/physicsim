@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://chvkjv7u0626o"]
 
-[ext_resource type="Script" uid="uid://citst6lk8uvmb" path="res://src/sat.gd" id="1_b5l1b"]
-[ext_resource type="Script" uid="uid://b2ugthusebo3y" path="res://src/sat_polygon.gd" id="2_4400u"]
+[ext_resource type="Script" uid="uid://citst6lk8uvmb" path="res://src/sat_detection.gd" id="1_b5l1b"]
+[ext_resource type="Script" uid="uid://b2ugthusebo3y" path="res://src/sat_shape.gd" id="2_4400u"]
 
 [node name="SAT" type="Node2D"]
 script = ExtResource("1_b5l1b")
@@ -22,14 +22,12 @@ offset_bottom = 23.0
 position = Vector2(179, 254)
 script = ExtResource("2_4400u")
 extents = 60.0
-shape_color = Color(0.26666668, 0.38431373, 1, 1)
 
 [node name="PolygonB" type="Node2D" parent="."]
 position = Vector2(568, 241)
 script = ExtResource("2_4400u")
 sides = 32
 extents = 80.0
-shape_color = Color(0, 0.6784314, 0.18431373, 1)
 
 [node name="PolygonC" type="Node2D" parent="."]
 position = Vector2(357.00003, 389.00003)
@@ -37,4 +35,3 @@ rotation = 0.7853982
 script = ExtResource("2_4400u")
 sides = 4
 extents = 80.0
-shape_color = Color(1, 0.7176471, 0.2627451, 1)

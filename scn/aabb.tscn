@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://bve4prjk524rj"]
+[gd_scene load_steps=2 format=3 uid="uid://bve4prjk524rj"]
 
-[ext_resource type="Script" uid="uid://h6gch2p48ak7" path="res://src/aabb.gd" id="1_o0hng"]
-[ext_resource type="Script" uid="uid://4bbcqseiiulw" path="res://src/aabb_quad.gd" id="2_2kgns"]
+[ext_resource type="Script" uid="uid://h6gch2p48ak7" path="res://src/aabb_detection.gd" id="1_o0hng"]
 
 [node name="AABB" type="Node2D"]
 position = Vector2(1, 0)
@@ -20,15 +19,3 @@ offset_left = 2.0
 offset_top = 1.0
 offset_right = 42.0
 offset_bottom = 24.0
-
-[node name="QuadA" type="Node2D" parent="."]
-position = Vector2(500, 200)
-script = ExtResource("2_2kgns")
-half_extents = Vector2(80, 40)
-shape_color = Color(0.26666668, 0.38431373, 1, 1)
-
-[node name="QuadB" type="Node2D" parent="."]
-position = Vector2(320, 240)
-script = ExtResource("2_2kgns")
-half_extents = Vector2(40, 60)
-shape_color = Color(0, 0.6784314, 0.18431373, 1)

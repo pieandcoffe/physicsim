@@ -6,7 +6,7 @@ extends Node2D
 
 var speed: float = 120.0
 var rot_speed: float = 1.5
-var collision_shapes: Array = []
+var collision_shapes: Array[CollisionShape] = []
 
 # nav
 const nav = preload("res://scn/nav.tscn")
@@ -17,18 +17,17 @@ func _ready() -> void:
 	color_rect.size = viewport_size
 	get_viewport().size_changed.connect(_on_viewport_resized)
 
+	_on_ready_custom()
 	_collect_collision_shapes()
 	add_child(nav.instantiate())
 	set_process_input(true)
-	_on_ready_custom()
 
 func _on_ready_custom() -> void:
 	pass
 
 func _on_viewport_resized() -> void:
-	var viewport_size = get_viewport_rect().size
 	color_rect.position = Vector2.ZERO
-	color_rect.size = viewport_size
+	color_rect.size = get_viewport_rect().size
 
 func _process(delta: float) -> void:
 	_handle_input(delta)
@@ -42,6 +41,9 @@ func _handle_input(_delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
+		var any_dragging = collision_shapes.any(func(s): return s._dragging)
+		if any_dragging:
+			return
 		var shape = _spawn_collision_shape(to_local(event.position))
 		if shape:
 			add_child(shape)
@@ -62,6 +64,7 @@ func _spawn_collision_shape(_position: Vector2) -> CollisionShape:
 func _update_collision_state() -> void:
 	for shape in collision_shapes:
 		shape.overlap = false
+		shape.overlap_shapes.clear()
 
 	for i in range(collision_shapes.size()):
 		for j in range(i + 1, collision_shapes.size()):
@@ -70,6 +73,9 @@ func _update_collision_state() -> void:
 			if _shapes_collide(a, b):
 				a.overlap = true
 				b.overlap = true
+				a.overlap_shapes.append(b)
+				b.overlap_shapes.append(a)
+				a.resolve_collision(b, a.get_mtv(b))
 
 func _shapes_collide(_a: CollisionShape, _b: CollisionShape) -> bool:
 	return false

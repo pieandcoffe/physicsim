@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://cqcr2no73h1pp"]
+[gd_scene load_steps=2 format=3 uid="uid://cqcr2no73h1pp"]
 
-[ext_resource type="Script" uid="uid://b7s672xx0qtx8" path="res://src/obb.gd" id="1_2n1an"]
-[ext_resource type="Script" uid="uid://d2lgbkahqe3mx" path="res://src/obb_quad.gd" id="2_fgrge"]
+[ext_resource type="Script" uid="uid://b7s672xx0qtx8" path="res://src/obb_detection.gd" id="1_2n1an"]
 
 [node name="OBB" type="Node2D"]
 script = ExtResource("1_2n1an")
@@ -17,17 +16,3 @@ color = Color(0.11764706, 0.11764706, 0.11764706, 1)
 [node name="Label" type="Label" parent="HUD"]
 offset_right = 40.0
 offset_bottom = 23.0
-
-[node name="QuadA" type="Node2D" parent="."]
-position = Vector2(158, 288)
-rotation = -0.6894051
-script = ExtResource("2_fgrge")
-half_extents = Vector2(80, 40)
-shape_color = Color(0.26666668, 0.38431373, 1, 1)
-
-[node name="QuadB" type="Node2D" parent="."]
-position = Vector2(300, 200)
-rotation = 2.4102998
-script = ExtResource("2_fgrge")
-half_extents = Vector2(40, 60)
-shape_color = Color(0, 0.6784314, 0.18431373, 1)
