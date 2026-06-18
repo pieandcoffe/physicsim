@@ -8,6 +8,8 @@ var speed: float = 120.0
 var rot_speed: float = 1.5
 var collision_shapes: Array[CollisionShape] = []
 
+var resolve_collisions_enabled : bool = true
+
 # nav
 const nav = preload("res://scn/nav.tscn")
 
@@ -37,7 +39,8 @@ func _process(delta: float) -> void:
 	queue_redraw()
 	
 func _handle_input(_delta: float) -> void:
-	pass
+	if Input.is_key_pressed(KEY_SPACE):
+		resolve_collisions_enabled = not resolve_collisions_enabled
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
@@ -63,22 +66,21 @@ func _spawn_collision_shape(_position: Vector2) -> CollisionShape:
 
 func _update_collision_state() -> void:
 	for shape in collision_shapes:
-		shape.overlap = false
+		shape.overlapping = false
 		shape.overlap_shapes.clear()
 
 	for i in range(collision_shapes.size()):
 		for j in range(i + 1, collision_shapes.size()):
 			var a = collision_shapes[i]
 			var b = collision_shapes[j]
-			if _shapes_collide(a, b):
-				a.overlap = true
-				b.overlap = true
+			if a.overlap(b):
+				a.overlapping = true
+				b.overlapping = true
 				a.overlap_shapes.append(b)
 				b.overlap_shapes.append(a)
-				a.resolve_collision(b, a.get_mtv(b))
-
-func _shapes_collide(_a: CollisionShape, _b: CollisionShape) -> bool:
-	return false
+				
+				if resolve_collisions_enabled:
+					a.resolve_collision(b)
 
 func _queue_redraws() -> void:
 	for shape in collision_shapes:

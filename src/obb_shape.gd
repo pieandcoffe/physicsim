@@ -58,3 +58,59 @@ func get_axes() -> Array:
 	
 func _get_corner_radius() -> float:
 	return CORNER_RATIO * min(half_extents.x, half_extents.y)
+
+func project_corners(corners: Array, axis: Vector2) -> Vector2:
+	var min_p := INF
+	var max_p := -INF
+	
+	for c in corners:
+		var p : float = c.dot(axis)
+		min_p = min(min_p, p)
+		max_p = max(max_p, p)
+		
+	return Vector2(min_p, max_p)
+
+func overlap(other: CollisionShape) -> bool:
+	if other is not OBBShape:
+		return false
+	
+	var corners_a := self.get_corner_positions()
+	var corners_b := other.get_corner_positions()
+	var axes_a := self.get_axes()
+	var axes_b := other.get_axes()
+	
+	for axis in [axes_a[0], axes_b[0], axes_a[1], axes_b[1]]:
+		var proj_a := project_corners(corners_a, axis)
+		var proj_b := project_corners(corners_b, axis)
+		if proj_a.y < proj_b.x or proj_b.y < proj_a.x:
+			return false
+			
+	return true
+	
+func get_mtv(other: CollisionShape) -> Vector2:
+	if not overlap(other):
+		return Vector2.ZERO
+
+	var corners_a := self.get_corner_positions()
+	var corners_b := other.get_corner_positions()
+	var axes_a := self.get_axes()
+	var axes_b := other.get_axes()
+
+	var min_overlap := INF
+	var mtv_axis := Vector2.ZERO
+
+	for axis in [axes_a[0], axes_a[1], axes_b[0], axes_b[1]]:
+		var proj_a := project_corners(corners_a, axis)
+		var proj_b := project_corners(corners_b, axis)
+
+		var overlap_amount: float = min(proj_a.y, proj_b.y) - max(proj_a.x, proj_b.x)
+
+		if overlap_amount < min_overlap:
+			min_overlap = overlap_amount
+			mtv_axis = axis
+
+	# ensure axis points from self to other
+	if (other.global_position - self.global_position).dot(mtv_axis) < 0:
+		mtv_axis = -mtv_axis
+
+	return mtv_axis * min_overlap

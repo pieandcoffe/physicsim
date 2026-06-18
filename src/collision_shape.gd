@@ -8,8 +8,8 @@ extends Node2D
 var velocity: Vector2 = Vector2.ZERO
 var mass: float = 0
 
-var overlap: bool = false
-var overlap_shapes: Array[CollisionShape] = []
+var overlapping : bool = false
+var overlap_shapes : Array[CollisionShape] = []
 
 var _dragging := false
 var _rotating := false
@@ -43,8 +43,53 @@ func _is_near_corner(_local: Vector2) -> bool:
 func _is_point_inside(_local: Vector2) -> bool:
 	return false
 	
-func resolve_collision(other: CollisionShape, mtv: Vector2) -> void:
-	pass
+func overlap(_other: CollisionShape) -> bool:
+	return false
+
+func get_mtv(_other: CollisionShape) -> Vector2:
+	return Vector2()
+
+func resolve_collision(other: CollisionShape) -> void:
+	# 1. Separate shapes using MTV
+	# MTV points from THIS shape toward OTHER shape.
+	var inv_mass_a := get_inv_mass()
+	var inv_mass_b := other.get_inv_mass()
+	var inv_mass_sum := inv_mass_a + inv_mass_b
+
+	var mtv =  self.get_mtv(other)
+
+	if inv_mass_sum == 0:
+		return  # both static
+
+	# Move each shape out of penetration
+	position -= mtv * (inv_mass_a / inv_mass_sum)
+	other.position += mtv * (inv_mass_b / inv_mass_sum)
+
+	# 2. Compute collision normal
+	var normal := mtv.normalized()
+
+	# 3. Relative velocity
+	var relative_vel := velocity - other.velocity
+
+	# 4. Relative velocity along the normal
+	var vel_along_normal := relative_vel.dot(normal)
+
+	if vel_along_normal > 0:
+		return
+
+	# 5. Compute restitution
+	var e = min(restitution, other.restitution)
+
+	# 6. Compute impulse scalar
+	var j = -(1.0 + e) * vel_along_normal
+	j /= inv_mass_sum
+
+	# 7. Apply impulse
+	var impulse = normal * j
+
+	velocity += impulse * inv_mass_a
+	other.velocity -= impulse * inv_mass_b
+
 
 func get_inv_mass() -> float:
 	return 0.0 if mass <= 0.0 else 1.0 / mass

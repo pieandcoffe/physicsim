@@ -4,35 +4,23 @@ extends CollisionDetection
 
 func _on_ready_custom() -> void:
 	var a = AABBShape.new(Vector2(300, 250))
-	a.init()
+	a.spawn()
 	add_child(a)
 
 	var b = AABBShape.new(Vector2(450, 250))
-	b.init()
+	b.spawn()
 	add_child(b)
 
 	collision_shapes.append(a)
 	collision_shapes.append(b)
 
-func aabb_overlap(a: AABBShape, b: AABBShape) -> bool:
-	if a.get_max().x < b.get_min().x: return false
-	if b.get_max().x < a.get_min().x: return false
-	if a.get_max().y < b.get_min().y: return false
-	if b.get_max().y < a.get_min().y: return false
-	return true
-
 func _spawn_collision_shape(p_position: Vector2) -> CollisionShape:
 	var s = AABBShape.new(p_position)
-	s.init()
+	s.spawn()
 	return s
 
-func _shapes_collide(a: CollisionShape, b: CollisionShape) -> bool:
-	if a is AABBShape and b is AABBShape:
-		return aabb_overlap(a, b)
-	return false
-
 func _update_label() -> void:
-	label.text = "[1 AABB]   2 OBB   3 SAT"
+	label.text = "[1 AABB]   2 OBB   3 SAT\n Resolve Collision [%s]" % resolve_collisions_enabled
 
 func _draw() -> void:
 	var axis_col = Color.WHITE_SMOKE

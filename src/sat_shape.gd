@@ -14,7 +14,7 @@ func _init(p_position: Vector2) -> void:
 	self._target_extents = randi_range(32, 96)
 	self.extents = 0.0
 	
-func _play_spawn_tween() -> void:
+func spawn() -> void:
 	var tween = create_tween()
 	tween.set_ease(Tween.EASE_OUT)
 	tween.set_trans(Tween.TRANS_BACK)
@@ -53,14 +53,38 @@ func get_corner_positions() -> Array:
 	
 func get_axes() -> Array:
 	var corners : Array = _get_local_corners()
-	
+	axes = []
 	for i in range(corners.size()):
 		var current = global_transform * corners[i]
 		var next = global_transform * corners[(i + 1) % corners.size()]
 		var edge = next - current
-		axes.append(edge.orthogonal().normalized())
-		
+		if edge.length_squared() > 0.0001:
+			axes.append(edge.orthogonal().normalized())
 	return axes
+	
+func overlap(other: CollisionShape) -> bool:
+	if other is not SATShape:
+		return false
+	
+	var shapes_axes = self.get_axes() + other.get_axes()
+	var corners_a = self.get_corner_positions()
+	var corners_b = other.get_corner_positions()
+	
+	for axis in shapes_axes:
+		var min_a = INF; var max_a = -INF
+		var min_b = INF; var max_b = -INF
+		
+		for c in corners_a:
+			var p = c.dot(axis)
+			min_a = min(min_a, p); max_a = max(max_a, p)
+		for c in corners_b:
+			var p = c.dot(axis)
+			min_b = min(min_b, p); max_b = max(max_b, p)
+		
+		if max_a < min_b or max_b < min_a:
+			return false
+	
+	return true
 
 func _draw_shape() -> void:
 	var corners : Array = _get_local_corners()
@@ -70,3 +94,30 @@ func _draw_shape() -> void:
 		var current = corners[i]
 		var next = corners[(i + 1) % corners.size()]
 		draw_line(current, next, shape_color, width)
+
+func get_mtv(other: CollisionShape) -> Vector2:
+	if other is not SATShape:
+		return Vector2.ZERO
+	if not overlap(other):
+		return Vector2.ZERO
+
+	var corners_a := self.get_corner_positions()
+	var corners_b := other.get_corner_positions()
+	var shapes_axes := self.get_axes() + other.get_axes()
+
+	var min_overlap := INF
+	var mtv_axis := Vector2.ZERO
+
+	for axis in shapes_axes:
+		var proj_a := project_corners(corners_a, axis)
+		var proj_b := project_corners(corners_b, axis)
+		var overlap_amount: float = min(proj_a.y, proj_b.y) - max(proj_a.x, proj_b.x)
+		if overlap_amount < min_overlap:
+			min_overlap = overlap_amount
+			mtv_axis = axis
+
+	# ensure axis points from self to other
+	if (other.global_position - self.global_position).dot(mtv_axis) < 0:
+		mtv_axis = -mtv_axis
+
+	return mtv_axis * min_overlap
